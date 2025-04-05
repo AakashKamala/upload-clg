@@ -75,6 +75,7 @@ export default function HomePage() {
       setUploading(false);
 
       if (res.ok) {
+        // Now we directly use the URL from Vercel Blob
         setShareLink(data.link);
       } else {
         alert(data.error || 'Something went wrong');
@@ -89,7 +90,7 @@ export default function HomePage() {
   // Handle copy link
   const handleCopy = () => {
     if (shareLink) {
-      navigator.clipboard.writeText(window.location.origin + shareLink);
+      navigator.clipboard.writeText(shareLink);
       alert('Link copied to clipboard!');
     }
   };
@@ -194,7 +195,7 @@ export default function HomePage() {
               darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
             }`}
           >
-            {window.location.origin + shareLink}
+            {shareLink}
           </a>
           
           <button

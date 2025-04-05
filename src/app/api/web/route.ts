@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import { mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { put } from '@vercel/blob';
 import { randomUUID } from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
-    // Check if uploads directory exists, create if not
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
     // Parse form data
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -33,18 +24,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate unique file name to prevent conflicts
+    // Generate unique file name
     const uniqueFileName = `${randomUUID()}-${fileName}`;
-    const filePath = join(uploadDir, uniqueFileName);
     
-    // Convert file to buffer and save it
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filePath, buffer);
+    // Convert file to arrayBuffer and upload to Vercel Blob Storage
+    const buffer = await file.arrayBuffer();
     
-    // Return the path accessible via public directory
-    const fileUrl = `/uploads/${uniqueFileName}`;
+    // Use Vercel Blob for file storage instead of the filesystem
+    const blob = await put(uniqueFileName, buffer, {
+      contentType: 'text/html',
+      access: 'public',
+    });
     
-    return NextResponse.json({ link: fileUrl }, { status: 200 });
+    // Return the URL from Vercel Blob
+    return NextResponse.json({ link: blob.url }, { status: 200 });
+    
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
