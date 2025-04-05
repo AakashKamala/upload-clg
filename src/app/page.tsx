@@ -67,7 +67,7 @@ export default function HomePage() {
 
     try {
       // Point to your Express backend URL here
-      const res = await fetch('http://localhost:5000/api/upload', {
+      const res = await fetch('https://deploy-clg-be.onrender.com/api/upload', {
         method: 'POST',
         body: formData,
         // No need to set Content-Type header as it's set automatically with boundary for FormData
