@@ -66,16 +66,17 @@ export default function HomePage() {
     formData.append('file', file);
 
     try {
-      const res = await fetch('/api/web', {
+      // Point to your Express backend URL here
+      const res = await fetch('http://localhost:5000/api/upload', {
         method: 'POST',
         body: formData,
+        // No need to set Content-Type header as it's set automatically with boundary for FormData
       });
 
       const data = await res.json();
       setUploading(false);
 
       if (res.ok) {
-        // Now we directly use the URL from Vercel Blob
         setShareLink(data.link);
       } else {
         alert(data.error || 'Something went wrong');
